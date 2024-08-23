@@ -33,34 +33,33 @@ class Users {
 
 const userDb = [];
 
-
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-app.get('/api/users' , (req, res) => {
-  res.json(userDb)
+app.get("/api/users", (req, res) => {
+  res.json(userDb);
 });
 
-app.get('/api/users/:_id/logs', (req, res) => {
+app.get("/api/users/:_id/logs", (req, res) => {
   const { _id } = req.params;
   const { from, to, limit } = req.query;
 
   const user = userDb.find((user) => user._id === _id);
 
   if (!user) {
-    return res.status(404).json({error: "User not found"})
-  };
+    return res.status(404).json({ error: "User not found" });
+  }
 
   let logs = user.exercises;
 
   if (from) {
     const fromDate = new Date(from);
-    logs = logs.filter((log) => new Date(log.date) >= fromDate)
+    logs = logs.filter((log) => new Date(log.date) >= fromDate);
   }
   if (to) {
     const toDate = new Date(to);
-    logs = logs.filter((log) => new Date(log.date)<= toDate);
+    logs = logs.filter((log) => new Date(log.date) <= toDate);
   }
 
   if (limit) {
@@ -71,9 +70,9 @@ app.get('/api/users/:_id/logs', (req, res) => {
     username: user.username,
     count: logs.length,
     _id: user._id,
-    log: logs
-  })
-})
+    log: logs,
+  });
+});
 
 app.post("/api/users", (req, res) => {
   const { username } = req.body;
@@ -81,23 +80,23 @@ app.post("/api/users", (req, res) => {
   userDb.push(user);
   res.json({
     username: user.username,
-    _id: user._id
+    _id: user._id,
   });
 });
 
-app.post('/api/users/:_id/exercises', (req, res) => {
+app.post("/api/users/:_id/exercises", (req, res) => {
   const { description, duration, date } = req.body;
   const { _id } = req.params;
   console.log("Received _id:", _id);
   console.log("Current userDb:", userDb);
   const exists = userDb.find((obj) => obj["_id"].toString() === _id);
   if (!exists) {
-    res.json({ error: "Cannot locate that user."})
+    res.json({ error: "Cannot locate that user." });
   } else {
-    const newUser = exists.addExercise(description, duration, date)
+    const newUser = exists.addExercise(description, duration, date);
     res.json(newUser);
   }
-})
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
